@@ -1,0 +1,51 @@
+version: "3.8"
+
+x-usr: &usr
+  admin
+x-pwd: &pwd
+  changeme
+x-db: &db
+  wordpress
+
+x-env: &env
+  environment:
+    MYSQL_ROOT_PASSWORD: *pwd
+    MYSQL_DATABASE: *db
+    MYSQL_USER: *usr
+    MYSQL_PASSWORD: *pwd
+
+    WORDPRESS_DB_HOST: db
+    WORDPRESS_DB_USER: *usr
+    WORDPRESS_DB_PASSWORD: *pwd
+    WORDPRESS_DB_NAME: *db
+
+    PMA_HOST: db 
+
+services: 
+  db:
+    <<: *env
+    platform: linux/arm64/v8
+    image: mariadb:latest
+    command: '--default-authentication-plugin=mysql_native_pwd'
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+
+  wp:
+    <<: *env
+    platform: linux/arm64/v8
+    image: wordpress:latest
+    depends_on:
+      - db
+    ports:
+      - 8888:80
+    volumes: 
+      - ./wp:/var/www/html/
+
+  pma:
+    <<: *env
+    platform: linux/arm64/v8
+    image: phpmyadmin:latest
+    depends_on:
+      - db
+    ports:
+      - 8889:80
