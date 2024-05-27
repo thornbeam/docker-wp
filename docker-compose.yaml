@@ -1,5 +1,3 @@
-version: "3.8"
-
 x-usr: &usr
   admin
 x-pwd: &pwd
@@ -40,6 +38,7 @@ services:
       - 8888:80
     volumes: 
       - ./wp:/var/www/html/
+      - ./wordpress.ini:/usr/local/etc/php/conf.d/wordpress.ini
 
   pma:
     <<: *env
